@@ -2,7 +2,7 @@
 
 subprojects {
     ext {
-        artifactVersion = '2.5.0'
+        artifactVersion = '2.5.1'
     }
 }
 
@@ -42,6 +42,8 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.1.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.2'
+
 
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'

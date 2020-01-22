@@ -4,7 +4,6 @@ apply plugin: 'kotlin-android'
 
 group = 'io.fotoapparat'
 
-kotlin.experimental.coroutines 'enable'
 
 android {
     buildToolsVersion versions.android.buildTools
@@ -26,10 +25,24 @@ android {
     }
 }
 
+configurations {
+    internalize // just define a separate configuration
+}
+
+/* a task to create the relocated libs, must be defined before used below in dependencies */
+task internalizeJar (type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    classifier = 'intern' // this is not needed but prevents conflicts with other artifacts you may want to create
+    def pkg = 'org.jetbrains.kotlinx' // lib to relocate
+    def shadowPrefix = 'our.package.name'
+    relocate pkg, [shadowPrefix, pkg].join ('.') // we want to relocate the above package
+    configurations = [project.configurations.internalize] // our configuration from above
+}
+
 dependencies {
     compile "com.android.support:support-annotations:${versions.android.support}"
     compile "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
-    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.30.2'
+    internalize 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.30.2'
+    implementation tasks.internalizeJar.outputs.files
 
     testImplementation "junit:junit:${versions.test.junit}"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${versions.kotlin}"
@@ -47,4 +60,5 @@ ext {
     libraryDescription = 'Camera library for Android with a more user-friendly API.'
 }
 
+apply plugin: 'com.github.johnrengelman.shadow'
 apply from: '../deploy.gradle'

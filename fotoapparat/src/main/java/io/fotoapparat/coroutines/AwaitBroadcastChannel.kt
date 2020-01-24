@@ -1,7 +1,9 @@
 package io.fotoapparat.coroutines
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 
@@ -31,7 +33,14 @@ internal class AwaitBroadcastChannel<T>(
         channel.send(element)
     }
 
-    override fun cancel(cause: Throwable?): Boolean {
-        return channel.cancel(cause) && deferred.cancel(cause)
+    override fun cancel(cause: Throwable?) : Boolean {
+        //return channel.cancel(cause) && deferred.cancel(cause)
+        return channel.close(cause) && deferred.complete(false)
     }
+
+    override fun cancel(cause: CancellationException?) {
+        channel.cancel(cause)
+        deferred.cancel(cause)
+    }
+
 }
